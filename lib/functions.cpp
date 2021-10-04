@@ -57,19 +57,15 @@ void fib_heap_insert(FibHeap* H, node* x) {
     H->n = H->n + 1;
 }
 
-void print_root_circle(node* z) {
+void print_root_list(node* z) {
     node* xt = z;
     if(xt != NULL) {
         if(xt->right != z) {
-            while(xt->right != z) {
+            do {
                 std::cout << "xt->key: " << xt->key;
                 std::cout << ", xt->degree: " << xt->degree << std::endl;
                 xt = xt->right;
-            }
-            if(xt->right == z) {
-                std::cout << "xt->key: " << xt->key;
-                std::cout << ", xt->degree: " << xt->degree << std::endl;
-            }
+            } while(xt != z);
         }
         else {
             std::cout << "X == X->RIGHT" << std::endl;
@@ -152,11 +148,11 @@ void consolidate(FibHeap* H) {
         A[i] = NULL;
     }
 
+    //Ensure all root nodes have unique degrees
     node* x = H->min;
     if(x != NULL) {
         //Root list contains more than one node
         if(x->right != H->min) {
-            //Ensure all root nodes have unique degrees
             bool there_is_dup = true;
             while(there_is_dup) {
                 there_is_dup = false;
@@ -198,7 +194,7 @@ void consolidate(FibHeap* H) {
     }
 }
 
-void print_child_circle(node* child) {
+void print_child_list(node* child) {
     node* xt = child;
     if(xt != NULL) {
         if(xt->right != child) {
@@ -228,34 +224,25 @@ void print_child_circle(node* child) {
     }
 }
 
-void print_circle(node* z) {
+void print_list(node* z) {
     node* xt = z;
     if(xt != NULL) {
         if(xt->right != z) {
-            while(xt->right != z) {
+            do {
                 std::cout << "xt->key: " << xt->key;
                 std::cout << ", xt->degree: " << xt->degree << std::endl;
                 if(xt->child != NULL) {
-                    print_child_circle(xt->child);
+                    print_child_list(xt->child);
                 }
                 xt = xt->right;
-            }
-            if(xt->right == z) {
-                std::cout << "xt->key: " << xt->key;
-                std::cout << ", xt->degree: " << xt->degree << std::endl;
-                if(xt->child != NULL) {
-                    if(xt->child != NULL) {
-                        print_child_circle(xt->child);
-                    }
-                }
-            }
+            } while(xt != z);
         }
         else {
             std::cout << "X == X->RIGHT" << std::endl;
             std::cout << "xt->key: " << xt->key;
             std::cout << ", xt->degree: " << xt->degree << std::endl;
             if(xt->child != NULL) {
-                print_child_circle(xt->child);
+                print_child_list(xt->child);
             }
         }
     }
@@ -267,21 +254,14 @@ bool numbers_children_match(node* z, int& num_nodes) {
 
     node* xt = z->child;
     if(xt != NULL) {
-        while(xt->right != z->child) {
+        do {
             num_of_nodes++;
             if(xt->child != NULL) {
                 nums_match = numbers_children_match(xt, num_nodes);
                 if(!nums_match) { return false; }
             }
             xt = xt->right;
-        }
-        if(xt->right == z->child) {
-            num_of_nodes++;
-            if(xt->child != NULL) {
-                nums_match = numbers_children_match(xt, num_nodes);
-                if(!nums_match) { return false; }
-            }
-        }
+        } while(xt != z->child);
 
         num_nodes = num_nodes + num_of_nodes;
 
@@ -300,21 +280,14 @@ fib_props numbers_match(node* z) {
 
     node* xt = z;
     if(xt != NULL) {
-        while(xt->right != z) {
+        do {
             num_nodes++;
             nums_match = numbers_children_match(xt, num_nodes);
             fib_heap_props.deg_is_num_child = nums_match;
             fib_heap_props.num_nodes = num_nodes;
             if(!nums_match) { return fib_heap_props; }
             xt = xt->right;
-        }
-        if(xt->right == z) {
-            num_nodes++;
-            nums_match = numbers_children_match(xt, num_nodes);
-            fib_heap_props.deg_is_num_child = nums_match;
-            fib_heap_props.num_nodes = num_nodes;
-            if(!nums_match) { return fib_heap_props; }
-        }
+        } while(xt != z);
     }
 
     fib_heap_props.deg_is_num_child = nums_match;
@@ -328,7 +301,7 @@ bool is_fib_heap_children(node* z) {
 
     node* xt = z->child;
     if(xt != NULL) {
-        while(xt->right != z->child) {
+        do {
             if(xt->p->key > xt->key) {
                 return is_fibheap = false;
             }
@@ -337,16 +310,7 @@ bool is_fib_heap_children(node* z) {
                 if(!is_fibheap) { return false; }
             }
             xt = xt->right;
-        }
-        if(xt->right == z->child) {
-            if(xt->p->key > xt->key) {
-                return is_fibheap = false;
-            }
-            if(xt->child != NULL) {
-                is_fibheap = is_fib_heap_children(xt);
-                if(!is_fibheap) { return false; }
-            }
-        }
+        } while(xt != z->child);
     }
 
     return is_fibheap;
@@ -355,13 +319,10 @@ bool is_fib_heap_children(node* z) {
 void nullify_children_parent_node(node* z) {
     node* xt = z->child;
     if(xt != NULL) {
-        while(xt->right != z->child) {
+        do {
             xt->p = NULL;
             xt = xt->right;
-        }
-        if(xt->right == z->child) {
-            xt->p = NULL;
-        }
+        } while(xt != z->child);
     }
 }
 
@@ -370,15 +331,11 @@ bool is_fib_heap(node* z) {
 
     node* xt = z;
     if(xt != NULL) {
-        while(xt->right != z) {
+        do {
             is_fibheap = is_fib_heap_children(xt);
             if(!is_fibheap) { return false; }
             xt = xt->right;
-        }
-        if(xt->right == z) {
-            is_fibheap = is_fib_heap_children(xt);
-            if(!is_fibheap) { return false; }
-        }
+        } while(xt != z);
     }
 
     return is_fibheap;
@@ -518,10 +475,9 @@ void populate_adj_and_weight_hr(int* index_map, int** adj_mat, float** weight_ma
 }
 
 bool check_fib_heap(FibHeap* H) {
-    /*This is the general test for the fibonacci heap.
-      The function returns true if the heap satisfies
-      the fibonacci heap properties
-     */
+    //This is the general test for the fibonacci heap.
+    //The function returns true if the heap satisfies
+    //the fibonacci heap properties
 
     //Compute heap properties
     fib_props fh_props = numbers_match(H->min);
