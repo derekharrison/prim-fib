@@ -68,7 +68,7 @@ void print_root_list(node* z) {
             } while(xt != z);
         }
         else {
-            std::cout << "X == X->RIGHT" << std::endl;
+            std::cout << "root list has just one node" << std::endl;
             std::cout << "xt->key: " << xt->key;
             std::cout << ", xt->degree: " << xt->degree << std::endl;
         }
@@ -198,26 +198,17 @@ void print_child_list(node* child) {
     node* xt = child;
     if(xt != NULL) {
         if(xt->right != child) {
-            while(xt->right != child) {
+            do {
                 std::cout << "xt->child->key: " << xt->key;
                 std::cout << ", xt->child->degree: " << xt->degree << std::endl;
                 if(xt->child != NULL) {
                     std::cout << "xt->child->child->key: " << xt->child->key << std::endl;
                 }
                 xt = xt->right;
-            }
-            if(xt->right == child) {
-                std::cout << "xt->child->key: " << xt->key;
-                std::cout << ", xt->child->degree: " << xt->degree << std::endl;
-                if(xt->child != NULL) {
-                    if(xt->child != NULL) {
-                        std::cout << "xt->child->child->key: " << xt->child->key << std::endl;
-                    }
-                }
-            }
+            } while(xt != child);
         }
         else {
-            std::cout << "X->CHILD == X->CHILD->RIGHT" << std::endl;
+            std::cout << "child list has only one node" << std::endl;
             std::cout << "xt->child->key: " << xt->key;
             std::cout << ", xt->child->degree: " << xt->degree << std::endl;
         }
@@ -238,7 +229,7 @@ void print_list(node* z) {
             } while(xt != z);
         }
         else {
-            std::cout << "X == X->RIGHT" << std::endl;
+            std::cout << "list has just one node" << std::endl;
             std::cout << "xt->key: " << xt->key;
             std::cout << ", xt->degree: " << xt->degree << std::endl;
             if(xt->child != NULL) {
@@ -346,7 +337,6 @@ node* fib_heap_extract_min(FibHeap* H) {
     node* z = H->min;
 
     if(z != NULL) {
-
         //Add each child of z to root list
         node* y = z->child;
         if(y != NULL) {
@@ -370,7 +360,6 @@ node* fib_heap_extract_min(FibHeap* H) {
             H->min = NULL;
         }
         else {
-
             H->min = z->right;
             consolidate(H);
         }
