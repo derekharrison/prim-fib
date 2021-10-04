@@ -146,8 +146,9 @@ void consolidate(FibHeap* H) {
     double f = log(H->n) / log(golden);
     int D = floor(f + 0.01) + 1;
 
-    node** A = new node*[D + 2];
-    for(int i = 0; i < D + 2; ++i) {
+    //Allocate memory for root list constuction
+    node** A = new node*[D + 1];
+    for(int i = 0; i < D + 1; ++i) {
         A[i] = NULL;
     }
 
@@ -160,13 +161,10 @@ void consolidate(FibHeap* H) {
             while(there_is_dup) {
                 there_is_dup = false;
                 x = H->min;
-                while(x->right != H->min) {
+                do {
                     link_dup_deg(H, A, x, there_is_dup);
                     x = x->right;
-                }
-                if(x->right == H->min) {
-                    link_dup_deg(H, A, x, there_is_dup);
-                }
+                } while(x != H->min);
             }
         }
         //Root list contains just one node
@@ -178,7 +176,7 @@ void consolidate(FibHeap* H) {
 
     //Reconstruct root list
     H->min = NULL;
-    for(int i = 0; i < D + 2; ++i) {
+    for(int i = 0; i < D + 1; ++i) {
         if(A[i] != NULL) {
             if(H->min == NULL) {
                 A[i]->left = A[i];
