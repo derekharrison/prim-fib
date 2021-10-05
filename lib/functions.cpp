@@ -414,11 +414,11 @@ void set_index_map(int size_graph, int* index_map, int s) {
 }
 
 void populate_weight_and_ref(FibHeap* H,
-		                     int* index_map,
+                             int* index_map,
                              float** weight_mat,
                              int size_graph,
                              std::vector<edge>& edges,
-							 node** v_ref) {
+                             node** v_ref) {
 
     int** elem_is_set = int2D(size_graph);
 
