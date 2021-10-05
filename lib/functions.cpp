@@ -96,7 +96,7 @@ void make_child_of(FibHeap* H, node* y, node* x) {
 
 void link_dup_deg(FibHeap* H, node** A, node*& x, bool& there_is_dup) {
     int d = x->degree;
-    //There is a node with the same degree and node is not node x
+    //There is a node with the same degree and node A[d] is not node x
     if(A[d] != NULL && A[d] != x) {
         there_is_dup = true;
         node* y = A[d];
@@ -125,7 +125,7 @@ void link_dup_deg(FibHeap* H, node** A, node*& x, bool& there_is_dup) {
             x = y;
         }
     }
-    //There is no node with the same degree or node is node x
+    //There is no node with the same degree or node A[d] is node x
     else {
         A[d] = x;
     }
