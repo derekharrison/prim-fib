@@ -542,13 +542,12 @@ mst_props mst(int n, std::vector<edge>& edges, int s) {
     int* index_map = new int[n];
     set_index_map(n, index_map, s);
 
-    //Initialize heap
+    //Initialize heap reference and weight matrix
     int num_nodes = n;
     node** v_ref = new node*[num_nodes];
-
-    //Initialize weight and adjacency matrices
     float** weight_mat = float2D(n);
 
+    //Populate weight and heap references
     populate_weight_and_ref(&H, index_map, weight_mat, n, edges, v_ref);
 
     //Perform Prim's algorithm
