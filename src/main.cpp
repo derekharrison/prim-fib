@@ -13,9 +13,10 @@
 #include <time.h>
 #include <vector>
 
+#include "../inc/fib_heap.hpp"
+#include "../inc/prim.hpp"
 #include "../inc/memory.hpp"
 #include "../inc/user_types.hpp"
-#include "../inc/functions.hpp"
 
 int main(int argc, char* argv[])
 {
