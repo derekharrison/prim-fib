@@ -161,6 +161,9 @@ void consolidate(FibHeap* H) {
             }
         }
     }
+
+    //Free root list reference
+    delete [] A;
 }
 
 void print_child_list(node* child) {
@@ -391,25 +394,26 @@ int map_index(int n, int index, int s) {
     return r;
 }
 
-void populate_weight_and_ref(FibHeap* H,
-                             int start_vertex,
-                             float** weight_mat,
-                             int size_graph,
+void populate_weight_and_ref(int size_graph,
                              std::vector<edge>& edges,
-                             node** v_ref) {
+                             int start_vertex,
+                             FibHeap* H,
+                             float** weight_mat,
+                             node** node_refs) {
 
+    //Allocate set flags
     int** elem_is_set = int2D(size_graph);
 
     for(int i = 0; i < size_graph; ++i) {
-        v_ref[i] = new node;
-        v_ref[i]->key = inf;
-        v_ref[i]->index = i;
-        v_ref[i]->in_q = true;
-        v_ref[i]->pi = NULL;
+        node_refs[i] = new node;
+        node_refs[i]->key = inf;
+        node_refs[i]->index = i;
+        node_refs[i]->in_q = true;
+        node_refs[i]->pi = NULL;
         if(i == 0) {
-            v_ref[i]->key = 0.0;
+            node_refs[i]->key = 0.0;
         }
-        fib_heap_insert(H, v_ref[i]);
+        fib_heap_insert(H, node_refs[i]);
     }
 
     //Add references to adjacent nodes
@@ -422,8 +426,8 @@ void populate_weight_and_ref(FibHeap* H,
         int start =  map_index(size_graph, start_index, start_vertex);
         int end = map_index(size_graph, end_index, start_vertex);
 
-        v_ref[start]->adj_nodes.push_back(end);
-        v_ref[end]->adj_nodes.push_back(start);
+        node_refs[start]->adj_nodes.push_back(end);
+        node_refs[end]->adj_nodes.push_back(start);
 
         bool is_set = elem_is_set[start][end] == SETVAR;
         if(!is_set) {
@@ -440,6 +444,9 @@ void populate_weight_and_ref(FibHeap* H,
             }
         }
     }
+
+    //Free set flags
+    free_int2D(elem_is_set, size_graph);
 }
 
 bool check_fib_heap(FibHeap* H) {
@@ -465,7 +472,7 @@ bool check_fib_heap(FibHeap* H) {
 }
 
 
-void prim(FibHeap* H, float** w, node** v_ref) {
+void prim(FibHeap* H, float** w, node** node_refs) {
 
     //Perform Prim's algorithm
     while(H->n > 0) {
@@ -477,7 +484,7 @@ void prim(FibHeap* H, float** w, node** v_ref) {
         int num_adj_nodes = (int) u->adj_nodes.size();
         for(int i = 0; i < num_adj_nodes; ++i) {
             int index_ref = u->adj_nodes[i];
-            node* v = v_ref[index_ref];
+            node* v = node_refs[index_ref];
 
             if(v->in_q && v->key > w[u->index][v->index]) {
                 float weight = w[u->index][v->index];
@@ -490,11 +497,11 @@ void prim(FibHeap* H, float** w, node** v_ref) {
     }
 }
 
-float weight_mst(int size_heap, node** v_ref) {
+float weight_mst(int size_heap, node** node_refs) {
     float total_weight_mst = 0.0;
     for(int i = 0; i < size_heap; ++i) {
-        if(v_ref[i]->pi != NULL) {
-            float weight = v_ref[i]->key;
+        if(node_refs[i]->pi != NULL) {
+            float weight = node_refs[i]->key;
             total_weight_mst += weight;
         }
     }
@@ -527,22 +534,25 @@ mst_props mst(int n, std::vector<edge>& edges, int s) {
 
     //Initialize heap reference and weight matrix
     int num_nodes = n;
-    node** v_ref = new node*[num_nodes];
+    node** node_refs = new node*[num_nodes]; //The caller of mst(n, edges, s) needs to free node references
     float** weight_mat = float2D(n);
 
     //Populate weight and heap references
-    populate_weight_and_ref(&H, s, weight_mat, n, edges, v_ref);
+    populate_weight_and_ref(n, edges, s, &H, weight_mat, node_refs);
 
     //Perform Prim's algorithm
-    prim(&H, weight_mat, v_ref);
+    prim(&H, weight_mat, node_refs);
 
     //Compute MST weight
-    mst_weight = weight_mst(n, v_ref);
+    mst_weight = weight_mst(n, node_refs);
 
     //Store MST properties
     mst_props min_span_props;
     min_span_props.mst_weight = mst_weight;
-    min_span_props.node_arr = v_ref;
+    min_span_props.node_refs = node_refs;
+
+    //Free weight matrix
+    free_float2D(weight_mat, n);
 
     return min_span_props;
 }

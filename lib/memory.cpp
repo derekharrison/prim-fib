@@ -5,6 +5,8 @@
  *      Author: d-w-h
  */
 
+#include "../inc/user_types.hpp"
+
 int** int2D(const int size) {
     int** p = new int*[size];
 
@@ -23,4 +25,23 @@ float** float2D(const int size) {
     return p;
 }
 
+void free_int2D(int** p, int size) {
+    for(int i = 0; i < size; ++i)
+        delete [] p[i];
 
+    delete [] p;
+}
+
+void free_float2D(float** p, int size) {
+    for(int i = 0; i < size; ++i)
+        delete [] p[i];
+
+    delete [] p;
+}
+
+void free_node_refs(node** p, int size) {
+    for(int i = 0; i < size; ++i)
+        delete p[i];
+
+    delete [] p;
+}

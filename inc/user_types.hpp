@@ -43,7 +43,7 @@ typedef struct Node {
 
 typedef struct MSTProperties {
     float mst_weight;
-    node** node_arr;
+    node** node_refs;
 } mst_props;
 
 class FibHeap {

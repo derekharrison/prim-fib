@@ -13,13 +13,14 @@
 #include <time.h>
 #include <vector>
 
+#include "../inc/memory.hpp"
 #include "../inc/user_types.hpp"
 #include "../inc/functions.hpp"
 
 int main(int argc, char* argv[])
 {
     //Declarations
-    int s = 2; //Start vertex must be greater or equal to 1
+    int s = 2; //Start vertex. The minimum index for vertices is 1
     int n = 470; //Number of vertices
     int num_edges = 600; //Number of edges
 
@@ -41,9 +42,12 @@ int main(int argc, char* argv[])
     mst_props min_span_props = mst(n, edges, s);
 
     //Print results
-    print_mst(n, min_span_props.node_arr);
+    print_mst(n, min_span_props.node_refs);
     std::cout << "size of minimum spanning tree: " << min_span_props.mst_weight << std::endl;
     std::cout << "done" << std::endl;
+
+    //Free node references
+    free_node_refs(min_span_props.node_refs, n);
 
     return 0;
 }
