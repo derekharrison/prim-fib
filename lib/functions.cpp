@@ -11,25 +11,8 @@
 #include <vector>
 #include <math.h>
 
+#include "../inc/memory.hpp"
 #include "../inc/user_types.hpp"
-
-int** int2D(const int size) {
-    int** p = new int*[size];
-
-    for(int i = 0; i < size; ++i)
-        p[i] = new int[size];
-
-    return p;
-}
-
-float** float2D(const int size) {
-    float** p = new float*[size];
-
-    for(int i = 0; i < size; ++i)
-        p[i] = new float[size];
-
-    return p;
-}
 
 void fib_heap_insert(FibHeap* H, node* x) {
     x->degree = 0;
@@ -399,21 +382,17 @@ void fib_heap_decrease_key(FibHeap* H, node* x, float k) {
     }
 }
 
-void set_index_map(int size_graph, int* index_map, int s) {
+int map_index(int n, int index, int s) {
+    int r;
 
-    int index_track = 0;
-    for(int i = s; i < size_graph; ++i) {
-        index_map[i] = index_track;
-        index_track++;
-    }
-    for(int i = 0; i < s; ++i) {
-        index_map[i] = index_track;
-        index_track++;
-    }
+    if(index >= s) { r = index - s; }
+    else { r = n - s + index; }
+
+    return r;
 }
 
 void populate_weight_and_ref(FibHeap* H,
-                             int* index_map,
+                             int start_vertex,
                              float** weight_mat,
                              int size_graph,
                              std::vector<edge>& edges,
@@ -440,18 +419,25 @@ void populate_weight_and_ref(FibHeap* H,
         int end_index = edges[i].end_vertex - 1;
         float weight = edges[i].weight;
 
-        int start = index_map[start_index];
-        int end = index_map[end_index];
+        int start =  map_index(size_graph, start_index, start_vertex);
+        int end = map_index(size_graph, end_index, start_vertex);
 
         v_ref[start]->adj_nodes.push_back(end);
         v_ref[end]->adj_nodes.push_back(start);
 
-        if(elem_is_set[start][end] != SETVAR) {
-            weight_mat[start][end] = weight_mat[end][start] = weight;
-            elem_is_set[start][end] = elem_is_set[end][start] = SETVAR;
+        bool is_set = elem_is_set[start][end] == SETVAR;
+        if(!is_set) {
+            weight_mat[start][end] = weight;
+            weight_mat[end][start] = weight;
+            elem_is_set[start][end] = SETVAR;
+            elem_is_set[end][start] = SETVAR;
         }
-        else if(elem_is_set[start][end] == SETVAR && weight_mat[start][end] >= weight) {
-            weight_mat[start][end] = weight_mat[end][start] = weight;
+        else {
+        	bool is_greater = weight_mat[start][end] >= weight;
+        	if(is_greater) {
+                weight_mat[start][end] = weight;
+                weight_mat[end][start] = weight;
+        	}
         }
     }
 }
@@ -533,13 +519,11 @@ void print_mst(int size_heap, node** node_arr) {
 mst_props mst(int n, std::vector<edge>& edges, int s) {
 
     //Declarations
-    float mst_weight = 0.0;
     FibHeap H;
+    float mst_weight = 0.0;
 
-    //Set index map
+    //Map start vertex s to s - 1
     s = s - 1;
-    int* index_map = new int[n];
-    set_index_map(n, index_map, s);
 
     //Initialize heap reference and weight matrix
     int num_nodes = n;
@@ -547,7 +531,7 @@ mst_props mst(int n, std::vector<edge>& edges, int s) {
     float** weight_mat = float2D(n);
 
     //Populate weight and heap references
-    populate_weight_and_ref(&H, index_map, weight_mat, n, edges, v_ref);
+    populate_weight_and_ref(&H, s, weight_mat, n, edges, v_ref);
 
     //Perform Prim's algorithm
     prim(&H, weight_mat, v_ref);
