@@ -433,11 +433,11 @@ void populate_weight_and_ref(FibHeap* H,
             elem_is_set[end][start] = SETVAR;
         }
         else {
-        	bool is_greater = weight_mat[start][end] >= weight;
-        	if(is_greater) {
+            bool is_greater = weight_mat[start][end] >= weight;
+            if(is_greater) {
                 weight_mat[start][end] = weight;
                 weight_mat[end][start] = weight;
-        	}
+            }
         }
     }
 }
