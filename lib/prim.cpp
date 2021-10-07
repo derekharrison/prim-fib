@@ -31,9 +31,7 @@ void populate_weight_and_ref(int size_graph,
                              float** weight_mat,
                              node** node_refs) {
 
-    //Allocate set flags
-    int** elem_is_set = int2D(size_graph);
-
+    //Initialize and create heap
     for(int i = 0; i < size_graph; ++i) {
         node_refs[i] = new node;
         node_refs[i]->key = inf;
@@ -46,37 +44,38 @@ void populate_weight_and_ref(int size_graph,
         fib_heap_insert(H, node_refs[i]);
     }
 
-    //Add references to adjacent nodes
+    //Add references to adjacent nodes and set weight matrix
     int num_edges = (int) edges.size();
     for(int i = 0; i < num_edges; ++i) {
         int start_index = edges[i].start_vertex - 1;
         int end_index = edges[i].end_vertex - 1;
         float weight = edges[i].weight;
 
-        int start =  map_index(size_graph, start_index, start_vertex);
+        int start = map_index(size_graph, start_index, start_vertex);
         int end = map_index(size_graph, end_index, start_vertex);
 
         node_refs[start]->adj_nodes.push_back(end);
         node_refs[end]->adj_nodes.push_back(start);
 
-        bool is_set = elem_is_set[start][end] == SETVAR;
-        if(!is_set) {
-            weight_mat[start][end] = weight;
-            weight_mat[end][start] = weight;
-            elem_is_set[start][end] = SETVAR;
-            elem_is_set[end][start] = SETVAR;
-        }
-        else {
-            bool is_greater = weight_mat[start][end] >= weight;
-            if(is_greater) {
-                weight_mat[start][end] = weight;
-                weight_mat[end][start] = weight;
-            }
-        }
+        weight_mat[start][end] = weight;
+        weight_mat[end][start] = weight;
     }
 
-    //Free set flags
-    free_int2D(elem_is_set, size_graph);
+    //Traverse edges again to pick minimum weight
+    for(int i = 0; i < num_edges; ++i) {
+        int start_index = edges[i].start_vertex - 1;
+        int end_index = edges[i].end_vertex - 1;
+        float weight = edges[i].weight;
+
+        int start = map_index(size_graph, start_index, start_vertex);
+        int end = map_index(size_graph, end_index, start_vertex);
+
+        bool is_greater = weight_mat[start][end] >= weight;
+        if(is_greater) {
+            weight_mat[start][end] = weight;
+            weight_mat[end][start] = weight;
+        }
+    }
 }
 
 void prim(FibHeap* H, float** w, node** node_refs) {
