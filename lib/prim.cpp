@@ -115,20 +115,6 @@ float weight_mst(int size_heap, node** node_refs) {
     return total_weight_mst;
 }
 
-void print_mst(int size_heap, node** node_arr) {
-    for(int i = 0; i < size_heap; ++i) {
-        if(node_arr[i]->pi != NULL) {
-            int parent_index = node_arr[i]->pi->index;
-            int current_index = node_arr[i]->index;
-            float weight = node_arr[i]->key;
-            std::cout << "node index: " << current_index << ", ";
-            std::cout << "parent index: " << parent_index << ", ";
-            std::cout << "weight: " << weight;
-            std::cout << std::endl;
-        }
-    }
-}
-
 mst_props mst(int n, std::vector<edge>& edges, int s) {
 
     //Declarations
@@ -139,8 +125,7 @@ mst_props mst(int n, std::vector<edge>& edges, int s) {
     s = s - 1;
 
     //Initialize heap reference and weight matrix
-    int num_nodes = n;
-    node** node_refs = new node*[num_nodes]; //The caller of mst(n, edges, s) needs to free node references
+    node** node_refs = new node*[n]; //The caller of mst(n, edges, s) needs to free node references
     float** weight_mat = float2D(n);
 
     //Populate weight and heap references

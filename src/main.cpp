@@ -17,6 +17,7 @@
 #include "../inc/prim.hpp"
 #include "../inc/memory.hpp"
 #include "../inc/user_types.hpp"
+#include "../inc/support.hpp"
 
 int main(int argc, char* argv[])
 {

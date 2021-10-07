@@ -14,6 +14,20 @@
 #include "../inc/memory.hpp"
 #include "../inc/user_types.hpp"
 
+void print_mst(int size_heap, node** node_arr) {
+    for(int i = 0; i < size_heap; ++i) {
+        if(node_arr[i]->pi != NULL) {
+            int parent_index = node_arr[i]->pi->index;
+            int current_index = node_arr[i]->index;
+            float weight = node_arr[i]->key;
+            std::cout << "node index: " << current_index << ", ";
+            std::cout << "parent index: " << parent_index << ", ";
+            std::cout << "weight: " << weight;
+            std::cout << std::endl;
+        }
+    }
+}
+
 void print_root_list(node* z) {
     node* xt = z;
     if(xt != NULL) {
